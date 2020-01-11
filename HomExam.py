@@ -12,13 +12,14 @@ done_thresholds = []
 
 # Interval and dot values
 n = 100000
-d = 0.000000005
+d = 0.0000005
 interval_max = 1
 
 # Sampling values
-m_max = 6000
+m_max = 600
 gamma = 0.1
 alpha = 0.1
+long = 0.0137
 
 dot_interval = DotSpace(n, d, interval_max, DotSpace.UNIFORM_NORMAL_DIST)
 
@@ -83,7 +84,7 @@ def ignore_long_uniform(dots, n_probes, g, a, long_threshold):
     return (dots.max_val - dist_long_intervals) / mean + number_long_intervals
 
 
-ignore_long_uniform(dot_interval, m_max, gamma, alpha, 0.0137)
-plot_sample_true(sample_means, dot_interval.get_mean_no_longs(0.0137), "Sample Mean vs True Mean", 15)
-plot_sample_true(sample_variance, dot_interval.get_var_no_longs(0.0137), "Sample Variance vs True Variance", 15)
+ignore_long_uniform(dot_interval, m_max, gamma, alpha, long)
+plot_sample_true(sample_means, dot_interval.get_mean_no_longs(long), "Sample Mean vs True Mean", 15)
+plot_sample_true(sample_variance, dot_interval.get_var_no_longs(long), "Sample Variance vs True Variance", 15)
 plot_two(confidence_thresholds, done_thresholds, "Confidence threshold vs Gamma threshold", 15)
