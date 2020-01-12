@@ -1,4 +1,3 @@
-import matplotlib.pyplot as plt
 import math
 from DotSpace import DotSpace
 from HomeExamHelpers import *
@@ -11,7 +10,7 @@ confidence_thresholds = []
 done_thresholds = []
 
 # Interval and dot values
-n = 100000
+n = 1000000
 d = 0.0000005
 interval_max = 1
 
@@ -20,8 +19,6 @@ m_max = 600
 gamma = 0.1
 alpha = 0.1
 long = 0.0137
-
-dot_interval = DotSpace(n, d, interval_max, DotSpace.UNIFORM_NORMAL_DIST)
 
 
 def pure_uniform(dots, n_probes, g, a):
@@ -47,7 +44,7 @@ def pure_uniform(dots, n_probes, g, a):
         confidence_thresholds.append(confidence_limit)
         done_thresholds.append(done_limit)
 
-        if confidence_limit < done_limit:
+        if confidence_limit < done_limit and len(samples) > 100:
             break
     return dots.max_val / mean
 
@@ -70,7 +67,7 @@ def ignore_long_uniform(dots, n_probes, g, a, long_threshold):
             var = calculate_sample_variance(samples, mean)
 
             number_long_intervals = dots.long_intervals.number_of_unique_intervals
-            confidence_limit = stdtrit(i - number_long_intervals, 1 - a) * math.sqrt(var) / math.sqrt(i - number_long_intervals + 1)
+            confidence_limit = stdtrit(len(samples) - 1, 1 - a) * math.sqrt(var) / math.sqrt(len(samples))
             done_limit = g * mean
 
             sample_means.append(mean)
@@ -78,13 +75,14 @@ def ignore_long_uniform(dots, n_probes, g, a, long_threshold):
             confidence_thresholds.append(confidence_limit)
             done_thresholds.append(done_limit)
 
-            if confidence_limit < done_limit:
+            if confidence_limit < done_limit and len(samples) > 100:
                 break
     dist_long_intervals = dots.long_intervals.total_space_occupied
     return (dots.max_val - dist_long_intervals) / mean + number_long_intervals
 
 
-ignore_long_uniform(dot_interval, m_max, gamma, alpha, long)
-plot_sample_true(sample_means, dot_interval.get_mean_no_longs(long), "Sample Mean vs True Mean", 15)
-plot_sample_true(sample_variance, dot_interval.get_var_no_longs(long), "Sample Variance vs True Variance", 15)
-plot_two(confidence_thresholds, done_thresholds, "Confidence threshold vs Gamma threshold", 15)
+#dot_interval = DotSpace(n, d, interval_max, DotSpace.CHISQUARE_DIST)
+#print(ignore_long_uniform(dot_interval, m_max, gamma, alpha, long))
+#plot_sample_true(sample_means, dot_interval.get_mean_no_longs(long), "Sample Mean vs True Mean", 15)
+#plot_sample_true(sample_variance, dot_interval.get_var_no_longs(long), "Sample Variance vs True Variance", 15)
+#plot_two(confidence_thresholds, done_thresholds, "Confidence threshold vs Gamma threshold", 15)

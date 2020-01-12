@@ -172,7 +172,7 @@ class DotSpace:
     # Sample a random value
     def sample_value_uniform(self):
         sample_spot = random.rand() * self.max_val
-        return self.sample_value(sample_spot)
+        return self.sample_value_bin(sample_spot)
 
     def sample_value(self, value):
         j = 0
@@ -185,17 +185,37 @@ class DotSpace:
             right = self.dots[j]
         elif j == len(self.dots):
             left = self.dots[len(self.dots) - 1]
-            right = 1.0
+            right = self.max_val
         else:
             left = self.dots[j - 1]
             right = self.dots[j]
         return left, right
 
+    def sample_value_bin(self, value):
+        l_index = 0
+        r_index = len(self.dots) - 1
+        while True:
+            m = math.floor((l_index + r_index)/2)
+            left = self.dots[m]
+            # If we are checking the last element
+            if m == len(self.dots) - 1:
+                return left, self.max_val
+            # If we are checking the first element and value is to the left of it
+            if m == 0 and value < self.dots[0]:
+                return 0, self.dots[0]
+            right = self.dots[m + 1]
+            if value < left:
+                r_index = m
+            elif value >= right:
+                l_index = m + 1
+            else:
+                return left, right
+
     # Samples a random value, but keeps track of and ignores values over the long_threshold
     def sample_value_uniform_ignore_long(self, long_threshold):
         value = random.rand() * (self.max_val - self.long_intervals.total_space_occupied)
         value = self.long_intervals.scale_value(value)
-        left, right = self.sample_value(value)
+        left, right = self.sample_value_bin(value)
         # if long - add to long space, else to sampled intervals
         i = 0
         if right - left > long_threshold:
@@ -210,7 +230,7 @@ class DotSpace:
         while i < len(self.long_intervals) and value > self.long_intervals[i][0]:
             value += self.long_intervals[i][2]
             i += 1
-        left, right = self.sample_value(value)
+        left, right = self.sample_value_bin(value)
         # if long - add to long space, else to sampled intervals
         i = 0
         invert = 1
