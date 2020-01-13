@@ -63,7 +63,6 @@ def ignore_long_uniform(dots, n_probes, g, a, long_threshold):
             samples.append((1 / dist, dist))
         else:
             long_threshold *= (dots.max_val - dots.long_intervals.total_space_occupied)
-            print("Long: " + str(dist))
 
         if len(samples) > 0:
             mean = top_sum / bot_sum
