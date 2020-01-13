@@ -15,7 +15,6 @@ if __name__ == '__main__':
     gamma = 0.0
     alpha = 0.000001
     long = np.geomspace(0.25, 0.000125, 30)
-    print(long)
     dots_list = []
 
     x = []
@@ -33,7 +32,7 @@ if __name__ == '__main__':
         for j in range(num_trials):
             results.append(pool.apply_async(func=ignore_long_uniform, args=(dots_list[j], m_max, gamma, alpha, long[i])))
         q1 = [result.get() for result in results]
-        with open("E:\\Programming\\AdvancedAlgorithms\\longtest_run{}_alg.txt".format(i), "w+") as outfile:
+        with open("E:\\Programming\\AdvancedAlgorithms\\longtest_run{}_alg.txt".format(i + 23), "w+") as outfile:
             tot = 0
             tot1 = 0
             for k in range(len(q1)):
