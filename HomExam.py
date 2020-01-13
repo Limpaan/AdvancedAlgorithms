@@ -11,7 +11,7 @@ done_thresholds = []
 
 # Interval and dot values
 n = 1000000
-d = 0.0000005
+d = 0.00000005
 interval_max = 1
 
 # Sampling values
@@ -83,8 +83,9 @@ def ignore_long_uniform(dots, n_probes, g, a, long_threshold):
     return (dots.max_val - dist_long_intervals) / mean + number_long_intervals
 
 
-dot_interval = DotSpace(n, d, interval_max, DotSpace.CHISQUARE_DIST)
-print(ignore_long_uniform(dot_interval, m_max, gamma, alpha, long))
+for i in range(0, 11):
+    dot_interval = DotSpace(n, d, interval_max, i)
+#print(ignore_long_uniform(dot_interval, m_max, gamma, alpha, long))
 #plot_sample_true(sample_means, dot_interval.get_mean_no_longs(long), "Sample Mean vs True Mean", 15)
 #plot_sample_true(sample_variance, dot_interval.get_var_no_longs(long), "Sample Variance vs True Variance", 15)
 #plot_two(confidence_thresholds, done_thresholds, "Confidence threshold vs Gamma threshold", 15)

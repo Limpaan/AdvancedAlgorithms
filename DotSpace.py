@@ -1,5 +1,6 @@
 import numpy as np
 import numpy.random as random
+import matplotlib.pyplot as plt
 from IntervalCollection import IntervalCollection
 import math
 
@@ -15,7 +16,7 @@ class DotSpace:
 
     max_val = 1
 
-    def __init__(self, n, d, max_val=1, dot_distribution=random.randint(0, 7)):
+    def __init__(self, n, d, max_val=1, dot_distribution=random.randint(0, 11)):
         self.sampled_intervals = IntervalCollection()
         self.long_intervals = IntervalCollection()
         self.max_val = max_val
@@ -98,16 +99,43 @@ class DotSpace:
             values2 /= values2[-1]
             values2 = values2 * self.max_val * 0.5 + self.max_val * 0.5
             values = np.concatenate((values1, values2), axis=None)
+            values.sort()
         if case == 3:
             # Dense-Uniform distribution
             # Hiding a quarter of the dots in as small a space as possible
             print("Using Dense-Uniform distribution")
-            values = random.uniform() * self.max_val
             quarter_n = round(n / 4)
+            values1 = random.rand(n - quarter_n) * (self.max_val - quarter_n * d)
+            values1 += quarter_n * d
+            values2 = np.zeros(quarter_n)
             for i in range(quarter_n):
-                values[i] = d * i
+                values2[i] = d * i
+            values = np.concatenate((values1, values2), axis=None)
             values.sort()
         if case == 4:
+            # Dense-Normal distribution
+            print("Using Dense-Normal distribution")
+            quarter_n = round(n / 4)
+            values1 = random.normal(0, 1, n - quarter_n)
+            values1.sort()
+            values1 -= values1[0]
+            values1 /= values1[len(values1) - 1]
+            values1 *= (self.max_val - quarter_n * d)
+            values1 += quarter_n * d
+            values2 = np.zeros(quarter_n)
+            for i in range(quarter_n):
+                values2[i] = d * i
+            values = np.concatenate((values1, values2), axis=None)
+            values.sort()
+        if case == 5:
+            # Half-Empty-Half-Uniform distribution
+            print("Using Half-Empty-Half-Uniform distribution")
+            values = random.rand(n)
+            values *= 0.5
+            values[n - 1] = 1
+            values *= self.max_val
+            values.sort()
+        if case == 6:
             # Half-Empty-Half-Normal distribution
             print("Using Half-Empty-Half-Normal distribution")
             values = random.normal(0, 1, n)
@@ -117,7 +145,36 @@ class DotSpace:
             values *= 0.5
             values[n - 1] = 1
             values *= self.max_val
-        if case == 5:
+            values.sort()
+        if case == 7:
+            # Half-Sparse-Uniform distribution
+            print("Using Half-Sparse-Uniform distribution")
+            part_n = round(n/10000.0)
+            values1 = random.rand(n - part_n)
+            values1 *= 0.5
+            values2 = random.rand(part_n)
+            values2 *= 0.5
+            values2 += 0.5
+            values = np.concatenate((values1, values2), axis=None)
+            values.sort()
+        if case == 8:
+            # Half-Sparse-Normal distribution
+            print("Using Half-Sparse-Normal distribution")
+            part_n = round(n/10000.0)
+            values1 = random.normal(0, 1, n-part_n)
+            values1.sort()
+            values1 -= values1[0]
+            values1 /= values1[len(values1)-1]
+            values1 *= 0.5
+            values2 = random.normal(0, 1, part_n)
+            values2.sort()
+            values2 -= values2[0]
+            values2 /= values2[len(values2)-1]
+            values2 *= 0.5
+            values2 += 0.5
+            values = np.concatenate((values1, values2))
+            values.sort()
+        if case == 9:
             # Rising sizes distribution
             # Normal distribution that has a string of gaps, each twice the size of the previous
             print("Using rising sizes distribution")
@@ -129,7 +186,7 @@ class DotSpace:
             values *= 0.5
             for i in range(n_rising):
                 values[-(i + 1)] = 1 - d * math.pow(2, i)
-        if case == 6:
+        if case == 10:
             # Chi-Squared distribution
             print("Using Chi-Squared distribution")
             values = random.chisquare(2, n)
@@ -148,6 +205,22 @@ class DotSpace:
         assert sorted(values)
 
         return values
+
+    def plot_distribution(self, values, buckets):
+        y = np.zeros(buckets)
+        x = np.zeros(buckets)
+        k = 1
+        bucket_size = self.max_val / buckets
+        for i in range(len(values)):
+            if values[i] <= k * bucket_size:
+                y[k-1] += 1
+            else:
+                y[k] += 1
+                k += 1
+        for i in range(buckets):
+            x[i] = i * bucket_size
+        plt.plot(x, y)
+        plt.show()
 
     def is_sampled(self, value):
         return self.sampled_intervals.is_in_interval(value)
